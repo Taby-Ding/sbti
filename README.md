@@ -6,6 +6,17 @@
 </p>
 
 <p align="center">
+  <a href="https://sbti-wiki.vercel.app">
+    <img alt="在线查看" src="https://img.shields.io/badge/📱 在线查看-sbti--wiki.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://sbti-wiki.vercel.app"><strong>👉 手机浏览推荐使用网页版 👈</strong></a><br>
+  <sub>支持深色模式、弹窗详情、一键分享、深链接</sub>
+</p>
+
+<p align="center">
   <a href="https://sbti.fancc.de5.net"><img alt="原测试" src="https://img.shields.io/badge/原测试-sbti.fancc.de5.net-4CAF50?style=flat-square"></a>
   <img alt="总结局数" src="https://img.shields.io/badge/结局-27 种-blue?style=flat-square">
   <img alt="题目数" src="https://img.shields.io/badge/题目-30 + 1 隐藏-orange?style=flat-square">
@@ -28,6 +39,7 @@
 ## 📖 目录
 
 - [这是什么](#-这是什么)
+- [📱 在线网页版（手机推荐）](#-在线网页版手机推荐)
 - [如何看懂你的结果](#-如何看懂你的结果)
 - [十五维度一览](#-十五维度一览)
 - [27 种结局图鉴](#-27-种结局图鉴)
@@ -36,6 +48,23 @@
 - [数据来源与原理](#-数据来源与原理)
 - [鸣谢](#-鸣谢)
 - [License](#-license)
+
+---
+
+## 📱 在线网页版（手机推荐）
+
+**👉 [sbti-wiki.vercel.app](https://sbti-wiki.vercel.app)**
+
+为了方便手机浏览，本仓库的 [`web/`](web/) 目录包含一个独立的静态 HTML 版本，已部署到 Vercel：
+
+- 🌓 **深色模式**：跟随系统设置，也可手动切换
+- 📐 **移动优先**：网格布局自适应手机屏幕
+- 🪟 **弹窗详情**：点击人格卡片弹出 modal，查看完整解读和十五维度表
+- 🔗 **深链接**：每个人格有独立 URL hash（如 `#CTRL`），可直接分享
+- 📤 **一键分享**：调用 Web Share API（手机）或复制链接（桌面）
+- ⚡ **零构建**：纯 HTML + Tailwind CDN，单文件应用，秒开
+
+技术栈：Tailwind CDN + vanilla JS，27 个人格数据从 [`web/data/outcomes.json`](web/data/outcomes.json) 动态渲染，和 Markdown wiki 使用同一份权威数据。
 
 ---
 
