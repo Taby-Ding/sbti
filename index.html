@@ -681,32 +681,33 @@
       .dim-grid,
       .score-grid { grid-template-columns: 1fr; }
     }
-/* 分享海报样式 */
+/* ==================== 分享海报样式 ==================== */
 #shareModal {
   display: none;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0,0,0,0.9);
   z-index: 9999;
   align-items: center;
   justify-content: center;
+  padding: 20px;
 }
 
 .share-poster {
-  width: 320px;
+  width: 100%;
+  max-width: 340px;
   background: linear-gradient(180deg, #ffffff, #f8fbf9);
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-  font-family: inherit;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
 
 .poster-header {
   background: var(--accent-strong);
   color: white;
   text-align: center;
-  padding: 16px 12px;
-  font-size: 15px;
+  padding: 16px;
+  font-size: 16px;
   font-weight: 700;
 }
 
@@ -715,26 +716,28 @@
   text-align: center;
 }
 
+.poster-image {
+  width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  background: #f8fbf9;
+}
+
 .poster-type {
   font-size: 26px;
   font-weight: 800;
   color: var(--accent-strong);
-  margin: 12px 0 6px;
+  margin: 12px 0 8px;
+  line-height: 1.1;
 }
 
 .poster-intro {
   font-size: 15px;
   color: #333;
-  margin-bottom: 18px;
   line-height: 1.5;
-}
-
-#qrcode {
-  margin: 16px auto;
-  padding: 12px;
-  background: white;
-  border-radius: 12px;
-  display: inline-block;
+  margin-bottom: 20px;
 }
 
 .share-footer {
@@ -749,8 +752,8 @@
   display: flex;
   gap: 12px;
   padding: 16px;
-}
-  </style>
+  background: white;
+}  </style>
 </head>
 <body>
   <div class="shell">
@@ -763,15 +766,9 @@
         <div style="padding-top: 2rem; display: flex; flex-direction: column;">
           <span>
             原作者：
-            <a href="https://space.bilibili.com/417038183">B站@蛆肉儿串儿</a>
+            <a href="https://space.bilibili.com/417038183">B站@Q肉儿串儿</a>
           </span>
-          <span>
-            托管：Cloudflare (免费)
-          </span>
-          <span>
-            域名：Spaceship (自费)
-          </span>
-        </div>
+                </div>
       </div>
     </section>
 
@@ -847,30 +844,34 @@
     </button>
   </div>
 </div>
-<!-- ==================== 新增：分享海报弹窗 ==================== -->
-      <div id="shareModal">
-        <div class="share-poster" id="sharePoster">
-          <div class="poster-header">SBTI 人格测试</div>
-          <div class="poster-content">
-            <div class="type-kicker">你的测试结果</div>
-            <div class="poster-type" id="posterTypeName"></div>
-            <div class="poster-intro" id="posterIntro"></div>
-            
-            <div id="qrcode"></div>
-            
-            <div class="share-footer">
-              扫码测测你是什么人格<br>
-              <strong>快来一起被拿捏！</strong>
-            </div>
-          </div>
-        </div>
-        
-        <div class="share-actions">
-          <button onclick="closeShareModal()" class="btn-secondary">关闭</button>
-          <button onclick="downloadPoster()" class="btn-primary">保存海报</button>
-        </div>
+<!-- ==================== 最终版分享海报 ==================== -->
+<div id="shareModal">
+  <div class="share-poster" id="sharePoster">
+    <div class="poster-header">SBTI 人格测试</div>
+    <div class="poster-content">
+      <img id="posterResultImage" class="poster-image" alt="人格结果图"/>
+      
+      <div class="type-kicker">你的测试结果</div>
+      <div class="poster-type" id="posterTypeName"></div>
+      <div class="poster-intro" id="posterIntro"></div>
+      
+      <div id="qrcode" style="margin: 20px auto 16px; padding: 12px; background: white; border-radius: 12px; display: inline-block;"></div>
+      
+      <div class="share-footer">
+        扫码测测你是什么人格<br>
+        <strong>快来一起被拿捏！</strong>
       </div>
-      <!-- ==================== 海报弹窗结束 ==================== -->
+    </div>
+  </div>
+  
+  <div class="share-actions">
+    <button onclick="closeShareModal()" class="btn-secondary">关闭</button>
+    <button onclick="sharePosterToWeChat()" class="btn-primary" style="background:#07c160;">
+      直接分享到微信
+    </button>
+  </div>
+</div>     
+<!-- ==================== 海报弹窗结束 ==================== -->
     </section>
 
   </div>
@@ -1836,45 +1837,28 @@
     document.getElementById('submitBtn').addEventListener('click', renderResult);
     document.getElementById('restartBtn').addEventListener('click', () => startTest(false));
     document.getElementById('toTopBtn').addEventListener('click', () => showScreen('intro'));
-  // ==================== 加强版：分享到微信 ====================
-function shareToWeChat() {
+  // ==================== 最终版：直接分享到微信 ====================
+async function shareToWeChat() {
   const result = computeResult();
   const type = result.finalType;
 
-  const shareText = `我测出了【${type.code}（${type.cn}）】人格！\n\n` +
-                    `${type.intro}\n\n` +
-                    `快来一起测测你是什么人格吧～\n` +
-                    window.location.href;
-
-  // 1. 优先尝试浏览器原生分享（手机上效果最好）
-  if (navigator.share) {
-    navigator.share({
-      title: 'SBTI 人格测试',
-      text: shareText,
-      url: window.location.href
-    }).then(() => {
-      console.log('已唤起分享');
-    }).catch(err => {
-      console.log('原生分享取消或失败', err);
-      showPoster();   // 失败后显示海报
-    });
-  } 
-  // 2. 如果不支持原生分享，则直接显示海报
-  else {
-    showPoster();
-  }
-}
-
-function showPoster() {
-  const result = computeResult();
-  const type = result.finalType;
-
+  // 填充内容
   document.getElementById('posterTypeName').textContent = `${type.code}（${type.cn}）`;
   document.getElementById('posterIntro').textContent = type.intro;
 
+  // 显示人格图片
+  const resultImg = document.getElementById('posterResultImage');
+  const imageSrc = TYPE_IMAGES[type.code];
+  if (imageSrc) {
+    resultImg.src = imageSrc;
+    resultImg.style.display = 'block';
+  } else {
+    resultImg.style.display = 'none';
+  }
+
+  // 生成二维码
   const qrcodeContainer = document.getElementById('qrcode');
   qrcodeContainer.innerHTML = '';
-
   new QRCode(qrcodeContainer, {
     text: window.location.href,
     width: 200,
@@ -1887,61 +1871,49 @@ function showPoster() {
   document.getElementById('shareModal').style.display = 'flex';
 }
 
-function copyToClipboard(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    alert('✅ 已复制分享文案！\n\n直接粘贴到微信发给朋友即可～');
-  }).catch(() => {
-    alert('复制失败，请手动长按复制结果分享');
-  });
-}
+async function sharePosterToWeChat() {
+  const poster = document.getElementById('sharePoster');
 
-// ==================== 分享到微信（海报版） ====================
-let currentQRCode = null;
+  try {
+    const canvas = await html2canvas(poster, {
+      scale: 2.8,
+      useCORS: true,
+      backgroundColor: '#ffffff'
+    });
 
-function shareToWeChat() {
-  const result = computeResult();
-  const type = result.finalType;
+    canvas.toBlob(async (blob) => {
+      if (!blob) return alert('生成图片失败');
 
-  // 填充海报内容
-  document.getElementById('posterTypeName').textContent = `${type.code}（${type.cn}）`;
-  document.getElementById('posterIntro').textContent = type.intro;
+      const file = new File([blob], `SBTI_${document.getElementById('posterTypeName').textContent}.png`, { 
+        type: 'image/png' 
+      });
 
-  // 显示弹窗
-  document.getElementById('shareModal').style.display = 'flex';
-
-  // 生成二维码（使用 qrcode.js）
-  const qrcodeContainer = document.getElementById('qrcode');
-  qrcodeContainer.innerHTML = '';
-  
-  currentQRCode = new QRCode(qrcodeContainer, {
-    text: window.location.href,
-    width: 180,
-    height: 180,
-    colorDark: "#1e2a22",
-    colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.H
-  });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'SBTI 人格测试结果',
+          text: `我测出了【${document.getElementById('posterTypeName').textContent}】！`
+        });
+      } else {
+        // 降级处理
+        const link = document.createElement('a');
+        link.download = `SBTI_${document.getElementById('posterTypeName').textContent}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        
+        setTimeout(() => {
+          alert('✅ 图片已保存到相册！\n\n请打开微信 → 朋友圈 或 聊天 → 从相册选择这张图片分享');
+        }, 600);
+      }
+    }, 'image/png');
+  } catch (err) {
+    alert('分享失败，请稍后重试');
+    console.error(err);
+  }
 }
 
 function closeShareModal() {
   document.getElementById('shareModal').style.display = 'none';
-}
-
-function downloadPoster() {
-  const poster = document.getElementById('sharePoster');
-  
-  html2canvas(poster, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: '#ffffff'
-  }).then(canvas => {
-    const link = document.createElement('a');
-    link.download = `SBTI_${document.getElementById('resultTypeName').textContent}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    
-    alert('✅ 海报已保存！可直接发到微信朋友圈或发给朋友～');
-  });
 }
 
 // 绑定分享按钮
