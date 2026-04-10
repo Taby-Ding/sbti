@@ -1925,129 +1925,128 @@ async function shareToWeChat() {
 }
 
 // ==================== 只截干净海报（不含按钮） ====================
-// ==================== 终极方案：手动绘制海报（放弃自动截图）====================
+// ==================== 最终修复版：自动截图（暴力修复版）====================
 async function sharePosterToWeChat() {
     const posterContent = document.getElementById('posterContent');
-    const typeName = document.getElementById('posterTypeName') ? document.getElementById('posterTypeName').textContent : 'SBTI结果';
-    const typeDesc = document.getElementById('posterTypeDesc') ? document.getElementById('posterTypeDesc').textContent : '';
+    const typeName = document.getElementById('posterTypeName') ? document.getElementById('posterTypeName').textContent : '结果';
     
-    // 获取关键图片元素
-    const typeImg = document.getElementById('resultTypeImg'); // 假设人格图片 ID 是这个
-    const userAvatar = document.getElementById('userAvatar'); // 假设有头像
-    const qrCanvas = document.getElementById('qrcode'); // 假设二维码是一个 canvas 或 img
-
     if (!posterContent) {
-        alert('错误：找不到海报容器');
+        alert('错误：找不到海报容器 posterContent');
         return;
     }
 
     try {
-        // 1. 创建一个新的 Canvas 用于绘制海报
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
+        // 1. 确保结果已经计算并渲染
+        if (typeof computeResult === 'function') computeResult();
+        if (typeof renderResult === 'function') renderResult();
+
+        // 2. 【关键】等待所有图片加载完毕
+        await waitForImages(posterContent);
         
-        // 设置海报尺寸 (假设宽 750px，高 1334px，类似手机比例)
-        const width = 750;
-        const height = 1334;
-        canvas.width = width;
-        canvas.height = height;
+        // 3. 额外等待 1.5 秒，确保二维码渲染完成，布局稳定
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
-        // 2. 画背景 (白色)
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, width, height);
+        // 4. 截图
+        const canvas = await html2canvas(posterContent, {
+            scale: 2, // 2倍清晰度
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            timeout: 30000,
+            
+            // ==================== 核心：在克隆文档中暴力修复样式 ====================
+            onclone: async (clonedDoc) => {
+                // A. 强制显示结果容器
+                const resultArea = clonedDoc.getElementById('result');
+                if (resultArea) {
+                    resultArea.style.display = 'block';
+                    resultArea.style.visibility = 'visible';
+                    resultArea.style.opacity = '1';
+                    resultArea.style.height = 'auto';
+                    resultArea.style.overflow = 'visible';
+                }
 
-        // 3. 画顶部标题
-        ctx.fillStyle = '#333333';
-        ctx.font = 'bold 60px "Microsoft YaHei", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('我的 SBTI 人格报告', width / 2, 100);
+                // B. 【关键修复】暴力修复二维码居中
+                // 找到二维码容器（请确认你的二维码 ID 是 qrcode）
+                const qrArea = clonedDoc.getElementById('qrcode');
+                if (qrArea) {
+                    // 强制使用绝对定位居中
+                    qrArea.style.position = 'absolute';
+                    qrArea.style.left = '50%';
+                    qrArea.style.transform = 'translateX(-50%)';
+                    qrArea.style.margin = '0';
+                    qrArea.style.display = 'block';
+                }
 
-        // 4. 画人格类型文字
-        ctx.fillStyle = '#000000';
-        ctx.font = 'bold 80px "Microsoft YaHei", sans-serif';
-        ctx.fillText(typeName, width / 2, 250);
-
-        // 5. 画人格描述
-        ctx.fillStyle = '#666666';
-        ctx.font = '40px "Microsoft YaHei", sans-serif';
-        // 简单的文字换行逻辑
-        const descLines = getLines(ctx, typeDesc, width - 100);
-        descLines.forEach((line, i) => {
-            ctx.fillText(line, width / 2, 350 + i * 60);
+                // C. 【关键修复】将所有图片转 Base64，解决跨域空白
+                const images = clonedDoc.getElementsByTagName('img');
+                for (let i = 0; i < images.length; i++) {
+                    const img = images[i];
+                    // 只有网络图片才转换
+                    if (img.src && img.src.startsWith('http')) {
+                        try {
+                            // 这是一个异步操作，必须 await
+                            await convertImgToBase64(img);
+                        } catch (e) {
+                            console.warn('图片转换失败:', img.src);
+                        }
+                    }
+                }
+            }
         });
 
-        // 6. 画人格图片 (关键修复：手动绘制图片)
-        if (typeImg && typeImg.src) {
-            await drawImageWithCache(ctx, typeImg.src, 150, 450, 450, 450); // 居中绘制
-        }
-
-        // 7. 画二维码 (关键修复：手动定位)
-        // 假设二维码在底部，居中
-        if (qrCanvas) {
-            // 如果是 canvas 元素
-            if (qrCanvas.tagName === 'CANVAS') {
-                const qrImg = new Image();
-                qrImg.src = qrCanvas.toDataURL();
-                await new Promise(r => qrImg.onload = r);
-                // 居中计算：(总宽 - 二维码宽) / 2
-                const qrSize = 300; 
-                ctx.drawImage(qrImg, (width - qrSize) / 2, 1050, qrSize, qrSize);
-            } 
-            // 如果是 img 元素
-            else {
-                await drawImageWithCache(ctx, qrCanvas.src, (width - 300) / 2, 1050, 300, 300);
-            }
-        }
-
-        // 8. 画底部提示
-        ctx.fillStyle = '#999999';
-        ctx.font = '30px "Microsoft YaHei", sans-serif';
-        ctx.fillText('扫码查看详情', width / 2, 1250);
-
-        // 9. 显示结果
         const dataURL = canvas.toDataURL('image/png');
-        showImageModal(dataURL, '海报');
+        showImageModal(dataURL, typeName);
 
     } catch (err) {
         console.error("生成失败:", err);
-        alert("生成海报失败: " + err.message);
+        alert("生成海报失败: " + (err.message || "未知错误"));
     }
 }
 
-// ==================== 辅助函数：绘制图片（带缓存）====================
-function drawImageWithCache(ctx, src, x, y, w, h) {
+// ==================== 辅助函数：图片转 Base64 ====================
+function convertImgToBase64(imgElement) {
     return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
         const img = new Image();
-        img.crossOrigin = 'anonymous'; // 开启跨域
+        
+        img.crossOrigin = 'anonymous';
         img.onload = () => {
-            ctx.drawImage(img, x, y, w, h);
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            ctx.drawImage(img, 0, 0);
+            imgElement.src = canvas.toDataURL('image/png'); // 替换原图 src
             resolve();
         };
         img.onerror = reject;
-        img.src = src;
+        img.src = imgElement.src;
     });
 }
 
-// ==================== 辅助函数：文字换行====================
-function getLines(ctx, text, maxWidth) {
-    const words = text.split('');
-    const lines = [];
-    let currentLine = '';
+// ==================== 辅助函数：等待图片加载 ====================
+function waitForImages(element) {
+    return new Promise((resolve) => {
+        const images = element.getElementsByTagName('img');
+        let loadedCount = 0;
+        const totalCount = images.length;
+        if (totalCount === 0) { resolve(); return; }
 
-    words.forEach(word => {
-        const metrics = ctx.measureText(currentLine + word);
-        if (metrics.width > maxWidth && currentLine !== '') {
-            lines.push(currentLine);
-            currentLine = word;
-        } else {
-            currentLine += word;
+        for (let i = 0; i < totalCount; i++) {
+            const img = images[i];
+            if (img.complete && img.naturalHeight > 0) {
+                loadedCount++;
+            } else {
+                img.onload = () => { loadedCount++; if (loadedCount >= totalCount) resolve(); };
+                img.onerror = () => { loadedCount++; if (loadedCount >= totalCount) resolve(); };
+            }
         }
+        if (loadedCount >= totalCount) resolve();
     });
-    if (currentLine) lines.push(currentLine);
-    return lines;
 }
 
-// ==================== 辅助函数：弹窗显示图片====================
+// ==================== 辅助函数：弹窗显示图片 ====================
 function showImageModal(dataURL, fileName) {
     const oldModal = document.getElementById('speed-poster-modal');
     if (oldModal) oldModal.remove();
@@ -2086,7 +2085,6 @@ function showImageModal(dataURL, fileName) {
     document.getElementById('closePosterModalBtn').onclick = () => modal.remove();
     modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
 }
-
 
 
 
