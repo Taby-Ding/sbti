@@ -750,18 +750,21 @@
 
 /* 新增：按钮区域 - 放在海报内部下方 */
 .poster-actions {
-  padding: 0 18px 20px;
+  max-width: 360px;
+  margin: 20px auto 10px;
+  padding: 0 15px;
   display: flex;
   gap: 12px;
+  width: 100%;
 }
 
 .poster-actions button {
   flex: 1;
-  padding: 14px 0;
+  padding: 15px 0;
   border-radius: 14px;
-  font-weight: 700;
   font-size: 16px;
-} 
+  font-weight: 700;
+}
 </style>
 </head>
 <body>
@@ -871,11 +874,11 @@
     </button>
   </div>
 </div>
-<!-- ==================== 优化后布局的海报弹窗 ==================== -->
+<!-- ==================== 海报按钮分离版 ==================== -->
 <div id="shareModal">
   <div class="share-poster" id="sharePoster">
     <div class="poster-header">SBTI 人格测试</div>
-    <div class="poster-content">
+    <div class="poster-content" id="posterContent">
       <img id="posterResultImage" class="poster-image" alt="人格结果图"/>
       
       <div class="type-kicker">你的测试结果</div>
@@ -889,17 +892,16 @@
         <strong>快来一起被拿捏！</strong>
       </div>
     </div>
-    
-    <!-- 按钮移到海报内部下方 -->
-    <div class="poster-actions">
-      <button onclick="closeShareModal()" class="btn-secondary">关闭</button>
-      <button onclick="sharePosterToWeChat()" class="btn-primary" style="background:#07c160;">
-        分享到微信
-      </button>
-    </div>
   </div>
-</div>
-<!-- ==================== 海报弹窗结束 ==================== -->
+  
+  <!-- 按钮区域 - 固定在海报下方 -->
+  <div class="poster-actions">
+    <button onclick="closeShareModal()" class="btn-secondary">关闭</button>
+    <button onclick="sharePosterToWeChat()" class="btn-primary" style="background:#07c160;">
+      分享到微信
+    </button>
+  </div>
+</div><!-- ==================== 海报弹窗结束 ==================== -->
     </section>
 
   </div>
@@ -1899,13 +1901,13 @@ async function shareToWeChat() {
   document.getElementById('shareModal').style.display = 'flex';
 }
 
-// ==================== 优化版：兼容电脑 + 手机 ====================
+// ==================== 只截干净海报（不含按钮） ====================
 async function sharePosterToWeChat() {
-  const poster = document.getElementById('sharePoster');
+  const posterContent = document.getElementById('posterContent'); // 只截内容区
   const typeName = document.getElementById('posterTypeName').textContent.replace(/[（）]/g, '') || 'SBTI结果';
 
   try {
-    const canvas = await html2canvas(poster, {
+    const canvas = await html2canvas(posterContent, {
       scale: 2.8,
       useCORS: true,
       allowTaint: true,
@@ -1913,35 +1915,39 @@ async function sharePosterToWeChat() {
       logging: false
     });
 
-    const dataURL = canvas.toDataURL('image/png', 0.92);
+    const dataURL = canvas.toDataURL('image/png', 0.95);
 
-    // === 手机端优先尝试直接分享 ===
     if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
-      canvas.toBlob(async (blob) => {
-        const file = new File([blob], `SBTI_${typeName}.png`, { type: 'image/png' });
+      // 手机端：弹出干净大图让用户长按保存
+      const img = document.createElement('img');
+      img.src = dataURL;
+      img.style.cssText = `
+        position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+        max-width:92%; max-height:85%; z-index:10000; 
+        border:10px solid white; border-radius:16px; box-shadow:0 15px 40px rgba(0,0,0,0.7);
+      `;
 
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({
-              files: [file],
-              title: 'SBTI 人格测试结果',
-              text: `我测出了【${typeName}】！`
-            });
-            return;
-          } catch (e) {}
-        }
+      const tips = document.createElement('div');
+      tips.style.cssText = `
+        position:fixed; bottom:40px; left:50%; transform:translateX(-50%);
+        background:rgba(0,0,0,0.85); color:white; padding:12px 24px;
+        border-radius:999px; font-size:15px; z-index:10001;
+      `;
+      tips.textContent = '👇 长按图片保存到相册';
 
-        // 如果无法直接分享，则使用更可靠的保存方式
-        saveImageForMobile(dataURL, typeName);
-      });
-    } 
-    // === 电脑端直接下载 ===
-    else {
+      document.body.appendChild(img);
+      document.body.appendChild(tips);
+
+      const remove = () => { img.remove(); tips.remove(); };
+      img.onclick = tips.onclick = remove;
+
+    } else {
+      // 电脑端直接下载
       const link = document.createElement('a');
       link.download = `SBTI_${typeName}.png`;
       link.href = dataURL;
       link.click();
-      alert(`✅ 海报已下载！文件名为：SBTI_${typeName}.png`);
+      alert('✅ 海报已下载！');
     }
 
   } catch (err) {
@@ -1949,7 +1955,6 @@ async function sharePosterToWeChat() {
     alert('生成失败，请刷新页面后重试');
   }
 }
-
 // 手机专用保存方法（更可靠）
 function saveImageForMobile(dataURL, typeName) {
   // 方法1：创建临时图片让用户长按保存
