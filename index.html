@@ -686,75 +686,98 @@
   display: none;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.92);
   z-index: 9999;
   align-items: center;
   justify-content: center;
-  padding: 20px 15px;
+  padding: 15px 10px;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .share-poster {
   width: 100%;
-  max-width: 360px;
+  max-width: 340px;           /* 手机上不会太宽 */
   background: linear-gradient(180deg, #ffffff, #f8fbf9);
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .poster-content {
-  padding: 20px 18px 10px;
-  text-align: center;           /* 关键：整体居中 */
+  padding: 18px 16px 8px;
+  text-align: center;
+}
+
+.poster-image {
+  width: 100%;
+  max-height: 240px;          /* 防止图片过高 */
+  object-fit: contain;
+  border-radius: 14px;
+  margin-bottom: 16px;
 }
 
 .poster-type {
-  font-size: 26px;
+  font-size: clamp(22px, 5.5vw, 28px);   /* 自适应字体大小 */
   font-weight: 800;
   color: var(--accent-strong);
-  margin: 12px 0 8px;
+  margin: 10px 0 8px;
   line-height: 1.1;
-  text-align: center;
 }
 
 .poster-intro {
-  font-size: 15px;
+  font-size: clamp(14px, 3.8vw, 15.5px);
   color: #333;
-  line-height: 1.5;
-  margin-bottom: 20px;
-  text-align: center;
+  line-height: 1.55;
+  margin-bottom: 18px;
 }
 
 .type-kicker {
-  font-size: 14px;
+  font-size: 13.5px;
   color: var(--accent-strong);
   margin-bottom: 6px;
-  text-align: center;
 }
 
 .share-footer {
   background: #f6faf6;
-  padding: 14px;
+  padding: 13px 16px;
   font-size: 13px;
   color: var(--muted);
   text-align: center;
 }
 
+/* 按钮区域 */
 .poster-actions {
   width: 100%;
-  max-width: 360px;
+  max-width: 340px;
   display: flex;
   gap: 12px;
-  padding: 0 10px;
+  padding: 0 8px;
 }
 
 .poster-actions button {
   flex: 1;
-  padding: 16px 0;
+  padding: 15px 0;
   border-radius: 14px;
   font-size: 16px;
   font-weight: 700;
+}
+
+/* === 超速版按钮样式 === */
+.hero-actions .btn-accel {
+    background: linear-gradient(135deg, #ff8a00, #da4000);
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(255, 138, 0, 0.3);
+    font-weight: 700;
+    border: none;
+    font-size: 16px;
+}
+.hero-actions .btn-accel:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 40px rgba(255, 138, 0, 0.35);
 }
 </style>
 </head>
@@ -765,12 +788,19 @@
         <h1>MBTI已经过时，SBTI来了。</h1>
         <div class="hero-actions hero-actions-single">
           <button id="startBtn" class="btn-primary">开始测试</button>
+<!-- === 新增：超速版按钮 === -->
+    <button id="speedBtn" class="btn-accel">🚀 超速版（随机生成）</button>
         </div>
         <div style="padding-top: 2rem; display: flex; flex-direction: column;">
           <span>
             原作者：
             <a href="https://space.bilibili.com/417038183">B站@Q肉儿串儿</a>
           </span>
+<span>
+            首发官网：
+            <a href="https://sbti.unun.dev/">https://sbti.unun.dev</a>
+          </span>
+
                 </div>
       </div>
     </section>
@@ -868,7 +898,7 @@
 <!-- ==================== 海报按钮分离版 ==================== -->
 <div id="shareModal">
   <!-- 海报本体 -->
-  <div class="share-poster" id="sharePoster">
+  <div class="share-poster" id="sharePoster" style="max-width:340px;">
     <div class="poster-header">SBTI 人格测试</div>
     <div class="poster-content" id="posterContent">
       <img id="posterResultImage" class="poster-image" alt="人格结果图"/>
@@ -1895,101 +1925,172 @@ async function shareToWeChat() {
 }
 
 // ==================== 只截干净海报（不含按钮） ====================
+// ==================== 终极方案：手动绘制海报（放弃自动截图）====================
 async function sharePosterToWeChat() {
-  const posterContent = document.getElementById('posterContent'); // 只截内容区
-  const typeName = document.getElementById('posterTypeName').textContent.replace(/[（）]/g, '') || 'SBTI结果';
+    const posterContent = document.getElementById('posterContent');
+    const typeName = document.getElementById('posterTypeName') ? document.getElementById('posterTypeName').textContent : 'SBTI结果';
+    const typeDesc = document.getElementById('posterTypeDesc') ? document.getElementById('posterTypeDesc').textContent : '';
+    
+    // 获取关键图片元素
+    const typeImg = document.getElementById('resultTypeImg'); // 假设人格图片 ID 是这个
+    const userAvatar = document.getElementById('userAvatar'); // 假设有头像
+    const qrCanvas = document.getElementById('qrcode'); // 假设二维码是一个 canvas 或 img
 
-  try {
-    const canvas = await html2canvas(posterContent, {
-      scale: 2.8,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff',
-      logging: false
-    });
-
-    const dataURL = canvas.toDataURL('image/png', 0.95);
-
-    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
-      // 手机端：弹出干净大图让用户长按保存
-      const img = document.createElement('img');
-      img.src = dataURL;
-      img.style.cssText = `
-        position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-        max-width:92%; max-height:85%; z-index:10000; 
-        border:10px solid white; border-radius:16px; box-shadow:0 15px 40px rgba(0,0,0,0.7);
-      `;
-
-      const tips = document.createElement('div');
-      tips.style.cssText = `
-        position:fixed; bottom:40px; left:50%; transform:translateX(-50%);
-        background:rgba(0,0,0,0.85); color:white; padding:12px 24px;
-        border-radius:999px; font-size:15px; z-index:10001;
-      `;
-      tips.textContent = '👇 长按图片保存到相册';
-
-      document.body.appendChild(img);
-      document.body.appendChild(tips);
-
-      const remove = () => { img.remove(); tips.remove(); };
-      img.onclick = tips.onclick = remove;
-
-    } else {
-      // 电脑端直接下载
-      const link = document.createElement('a');
-      link.download = `SBTI_${typeName}.png`;
-      link.href = dataURL;
-      link.click();
-      alert('✅ 海报已下载！');
+    if (!posterContent) {
+        alert('错误：找不到海报容器');
+        return;
     }
 
-  } catch (err) {
-    console.error(err);
-    alert('生成失败，请刷新页面后重试');
-  }
+    try {
+        // 1. 创建一个新的 Canvas 用于绘制海报
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 设置海报尺寸 (假设宽 750px，高 1334px，类似手机比例)
+        const width = 750;
+        const height = 1334;
+        canvas.width = width;
+        canvas.height = height;
+
+        // 2. 画背景 (白色)
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+
+        // 3. 画顶部标题
+        ctx.fillStyle = '#333333';
+        ctx.font = 'bold 60px "Microsoft YaHei", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('我的 SBTI 人格报告', width / 2, 100);
+
+        // 4. 画人格类型文字
+        ctx.fillStyle = '#000000';
+        ctx.font = 'bold 80px "Microsoft YaHei", sans-serif';
+        ctx.fillText(typeName, width / 2, 250);
+
+        // 5. 画人格描述
+        ctx.fillStyle = '#666666';
+        ctx.font = '40px "Microsoft YaHei", sans-serif';
+        // 简单的文字换行逻辑
+        const descLines = getLines(ctx, typeDesc, width - 100);
+        descLines.forEach((line, i) => {
+            ctx.fillText(line, width / 2, 350 + i * 60);
+        });
+
+        // 6. 画人格图片 (关键修复：手动绘制图片)
+        if (typeImg && typeImg.src) {
+            await drawImageWithCache(ctx, typeImg.src, 150, 450, 450, 450); // 居中绘制
+        }
+
+        // 7. 画二维码 (关键修复：手动定位)
+        // 假设二维码在底部，居中
+        if (qrCanvas) {
+            // 如果是 canvas 元素
+            if (qrCanvas.tagName === 'CANVAS') {
+                const qrImg = new Image();
+                qrImg.src = qrCanvas.toDataURL();
+                await new Promise(r => qrImg.onload = r);
+                // 居中计算：(总宽 - 二维码宽) / 2
+                const qrSize = 300; 
+                ctx.drawImage(qrImg, (width - qrSize) / 2, 1050, qrSize, qrSize);
+            } 
+            // 如果是 img 元素
+            else {
+                await drawImageWithCache(ctx, qrCanvas.src, (width - 300) / 2, 1050, 300, 300);
+            }
+        }
+
+        // 8. 画底部提示
+        ctx.fillStyle = '#999999';
+        ctx.font = '30px "Microsoft YaHei", sans-serif';
+        ctx.fillText('扫码查看详情', width / 2, 1250);
+
+        // 9. 显示结果
+        const dataURL = canvas.toDataURL('image/png');
+        showImageModal(dataURL, '海报');
+
+    } catch (err) {
+        console.error("生成失败:", err);
+        alert("生成海报失败: " + err.message);
+    }
 }
-// 手机专用保存方法（更可靠）
-function saveImageForMobile(dataURL, typeName) {
-  // 方法1：创建临时图片让用户长按保存
-  const img = document.createElement('img');
-  img.src = dataURL;
-  img.style.position = 'fixed';
-  img.style.top = '50%';
-  img.style.left = '50%';
-  img.style.transform = 'translate(-50%, -50%)';
-  img.style.maxWidth = '90%';
-  img.style.maxHeight = '85%';
-  img.style.zIndex = '10000';
-  img.style.border = '8px solid white';
-  img.style.borderRadius = '12px';
-  img.style.boxShadow = '0 10px 30px rgba(0,0,0,0.6)';
 
-  const tips = document.createElement('div');
-  tips.style.position = 'fixed';
-  tips.style.bottom = '30px';
-  tips.style.left = '50%';
-  tips.style.transform = 'translateX(-50%)';
-  tips.style.background = 'rgba(0,0,0,0.85)';
-  tips.style.color = 'white';
-  tips.style.padding = '12px 20px';
-  tips.style.borderRadius = '999px';
-  tips.style.fontSize = '15px';
-  tips.style.zIndex = '10001';
-  tips.innerHTML = '👇 长按图片保存到相册';
+// ==================== 辅助函数：绘制图片（带缓存）====================
+function drawImageWithCache(ctx, src, x, y, w, h) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous'; // 开启跨域
+        img.onload = () => {
+            ctx.drawImage(img, x, y, w, h);
+            resolve();
+        };
+        img.onerror = reject;
+        img.src = src;
+    });
+}
 
-  document.body.appendChild(img);
-  document.body.appendChild(tips);
+// ==================== 辅助函数：文字换行====================
+function getLines(ctx, text, maxWidth) {
+    const words = text.split('');
+    const lines = [];
+    let currentLine = '';
 
-  // 点击图片或空白处关闭
-  const close = () => {
-    img.remove();
-    tips.remove();
-  };
-  img.onclick = close;
-  tips.onclick = close;
+    words.forEach(word => {
+        const metrics = ctx.measureText(currentLine + word);
+        if (metrics.width > maxWidth && currentLine !== '') {
+            lines.push(currentLine);
+            currentLine = word;
+        } else {
+            currentLine += word;
+        }
+    });
+    if (currentLine) lines.push(currentLine);
+    return lines;
+}
 
-  alert('✅ 海报已生成！\n\n请**长按上方图片** → 选择「保存图片」');
-}function closeShareModal() {
+// ==================== 辅助函数：弹窗显示图片====================
+function showImageModal(dataURL, fileName) {
+    const oldModal = document.getElementById('speed-poster-modal');
+    if (oldModal) oldModal.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'speed-poster-modal';
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.85); z-index: 99999;
+        display: flex; justify-content: center; align-items: center;
+        flex-direction: column;
+    `;
+
+    const img = document.createElement('img');
+    img.src = dataURL;
+    img.style.cssText = `
+        max-width: 90%; max-height: 80%;
+        border: 5px solid #fff; border-radius: 8px;
+        background: #fff;
+    `;
+
+    const tip = document.createElement('div');
+    tip.innerHTML = `
+        <p style="color:white; font-size:18px; margin:20px 0 10px; font-weight:bold;">海报已生成</p>
+        <p style="color:#ddd; font-size:14px; margin-bottom:20px;">
+            PC端：右键图片 -> "图片另存为"<br>手机端：长按保存
+        </p>
+        <button id="closePosterModalBtn" style="padding:10px 24px; cursor:pointer; background:#07c160; color:white; border:none; border-radius:6px; font-size:16px;">关闭</button>
+    `;
+    tip.style.textAlign = 'center';
+
+    modal.appendChild(img);
+    modal.appendChild(tip);
+    document.body.appendChild(modal);
+
+    document.getElementById('closePosterModalBtn').onclick = () => modal.remove();
+    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+}
+
+
+
+
+function closeShareModal() {
   document.getElementById('shareModal').style.display = 'none';
 }
 
@@ -2007,10 +2108,27 @@ document.getElementById('topHomeBtn').addEventListener('click', () => {
 document.getElementById('topShareBtn').addEventListener('click', () => {
   shareToWeChat();
 });
+// === 超速版功能：随机生成结果 ===
+document.getElementById('speedBtn').addEventListener('click', () => {
+    // 1. 生成随机答案
+    // 遍历所有普通题目（questions）和特殊题目（specialQuestions）
+    [...questions, ...specialQuestions].forEach(q => {
+        // 获取该题的所有选项，随机选一个 value
+        const randomOption = q.options[Math.floor(Math.random() * q.options.length)];
+        app.answers[q.id] = randomOption.value;
+    });
+
+    // 2. 强制触发计算并渲染结果
+    // 这里直接调用 renderResult，它会自动调用 computeResult
+    renderResult();
+});
 </script>
 <!-- 【新增】海报分享需要的两个库 -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js">
+
+</script>
+
 
 </body>
 </html>
