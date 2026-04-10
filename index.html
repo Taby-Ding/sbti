@@ -1978,48 +1978,10 @@ async function sharePosterToWeChat() {
     alert('生成失败，请刷新页面后重试');
   }
 }
-// 手机专用保存方法（更可靠）
-function saveImageForMobile(dataURL, typeName) {
-  // 方法1：创建临时图片让用户长按保存
-  const img = document.createElement('img');
-  img.src = dataURL;
-  img.style.position = 'fixed';
-  img.style.top = '50%';
-  img.style.left = '50%';
-  img.style.transform = 'translate(-50%, -50%)';
-  img.style.maxWidth = '90%';
-  img.style.maxHeight = '85%';
-  img.style.zIndex = '10000';
-  img.style.border = '8px solid white';
-  img.style.borderRadius = '12px';
-  img.style.boxShadow = '0 10px 30px rgba(0,0,0,0.6)';
 
-  const tips = document.createElement('div');
-  tips.style.position = 'fixed';
-  tips.style.bottom = '30px';
-  tips.style.left = '50%';
-  tips.style.transform = 'translateX(-50%)';
-  tips.style.background = 'rgba(0,0,0,0.85)';
-  tips.style.color = 'white';
-  tips.style.padding = '12px 20px';
-  tips.style.borderRadius = '999px';
-  tips.style.fontSize = '15px';
-  tips.style.zIndex = '10001';
-  tips.innerHTML = '👇 长按图片保存到相册';
 
-  document.body.appendChild(img);
-  document.body.appendChild(tips);
 
-  // 点击图片或空白处关闭
-  const close = () => {
-    img.remove();
-    tips.remove();
-  };
-  img.onclick = close;
-  tips.onclick = close;
-
-  alert('✅ 海报已生成！\n\n请**长按上方图片** → 选择「保存图片」');
-}function closeShareModal() {
+function closeShareModal() {
   document.getElementById('shareModal').style.display = 'none';
 }
 
