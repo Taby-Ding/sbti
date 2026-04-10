@@ -1902,72 +1902,96 @@ async function shareToWeChat() {
 // ==================== 优化版：兼容电脑 + 手机 ====================
 async function sharePosterToWeChat() {
   const poster = document.getElementById('sharePoster');
-  const typeName = document.getElementById('posterTypeName').textContent || '结果';
+  const typeName = document.getElementById('posterTypeName').textContent.replace(/[（）]/g, '') || 'SBTI结果';
 
   try {
     const canvas = await html2canvas(poster, {
       scale: 2.8,
       useCORS: true,
+      allowTaint: true,
       backgroundColor: '#ffffff',
       logging: false
     });
 
-    // 转成图片
-    const dataURL = canvas.toDataURL('image/png');
+    const dataURL = canvas.toDataURL('image/png', 0.92);
 
-    // === 电脑端：直接下载 ===
-    if (!/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+    // === 手机端优先尝试直接分享 ===
+    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], `SBTI_${typeName}.png`, { type: 'image/png' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'SBTI 人格测试结果',
+              text: `我测出了【${typeName}】！`
+            });
+            return;
+          } catch (e) {}
+        }
+
+        // 如果无法直接分享，则使用更可靠的保存方式
+        saveImageForMobile(dataURL, typeName);
+      });
+    } 
+    // === 电脑端直接下载 ===
+    else {
       const link = document.createElement('a');
       link.download = `SBTI_${typeName}.png`;
       link.href = dataURL;
       link.click();
-      
-      alert('✅ 海报已保存！\n\n图片已下载到你的电脑，可以直接发到微信。');
-      return;
+      alert(`✅ 海报已下载！文件名为：SBTI_${typeName}.png`);
     }
-
-    // === 手机端：尝试直接分享 ===
-    canvas.toBlob(async (blob) => {
-      if (!blob) {
-        alert('生成图片失败，请重试');
-        return;
-      }
-
-      const file = new File([blob], `SBTI_${typeName}.png`, { type: 'image/png' });
-
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: 'SBTI 人格测试结果',
-            text: `我测出了【${typeName}】！`
-          });
-        } catch (e) {
-          downloadFallback(dataURL, typeName);
-        }
-      } else {
-        downloadFallback(dataURL, typeName);
-      }
-    }, 'image/png');
 
   } catch (err) {
     console.error(err);
-    alert('生成海报失败，请稍后重试');
+    alert('生成失败，请刷新页面后重试');
   }
 }
 
-// 下载降级函数
-function downloadFallback(dataURL, typeName) {
-  const link = document.createElement('a');
-  link.download = `SBTI_${typeName}.png`;
-  link.href = dataURL;
-  link.click();
-  
-  setTimeout(() => {
-    alert('✅ 海报已保存到相册！\n\n请打开微信，从相册选择这张图片分享～');
-  }, 600);
-}
-function closeShareModal() {
+// 手机专用保存方法（更可靠）
+function saveImageForMobile(dataURL, typeName) {
+  // 方法1：创建临时图片让用户长按保存
+  const img = document.createElement('img');
+  img.src = dataURL;
+  img.style.position = 'fixed';
+  img.style.top = '50%';
+  img.style.left = '50%';
+  img.style.transform = 'translate(-50%, -50%)';
+  img.style.maxWidth = '90%';
+  img.style.maxHeight = '85%';
+  img.style.zIndex = '10000';
+  img.style.border = '8px solid white';
+  img.style.borderRadius = '12px';
+  img.style.boxShadow = '0 10px 30px rgba(0,0,0,0.6)';
+
+  const tips = document.createElement('div');
+  tips.style.position = 'fixed';
+  tips.style.bottom = '30px';
+  tips.style.left = '50%';
+  tips.style.transform = 'translateX(-50%)';
+  tips.style.background = 'rgba(0,0,0,0.85)';
+  tips.style.color = 'white';
+  tips.style.padding = '12px 20px';
+  tips.style.borderRadius = '999px';
+  tips.style.fontSize = '15px';
+  tips.style.zIndex = '10001';
+  tips.innerHTML = '👇 长按图片保存到相册';
+
+  document.body.appendChild(img);
+  document.body.appendChild(tips);
+
+  // 点击图片或空白处关闭
+  const close = () => {
+    img.remove();
+    tips.remove();
+  };
+  img.onclick = close;
+  tips.onclick = close;
+
+  alert('✅ 海报已生成！\n\n请**长按上方图片** → 选择「保存图片」');
+}function closeShareModal() {
   document.getElementById('shareModal').style.display = 'none';
 }
 
