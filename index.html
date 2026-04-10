@@ -681,7 +681,7 @@
       .dim-grid,
       .score-grid { grid-template-columns: 1fr; }
     }
-/* ==================== 分享海报样式 ==================== */
+/* ==================== 优化后的分享海报样式 ==================== */
 #shareModal {
   display: none;
   position: fixed;
@@ -690,12 +690,12 @@
   z-index: 9999;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 20px 15px;
 }
 
 .share-poster {
   width: 100%;
-  max-width: 340px;
+  max-width: 360px;
   background: linear-gradient(180deg, #ffffff, #f8fbf9);
   border-radius: 20px;
   overflow: hidden;
@@ -712,7 +712,7 @@
 }
 
 .poster-content {
-  padding: 20px;
+  padding: 20px 18px 10px;
   text-align: center;
 }
 
@@ -721,7 +721,7 @@
   max-height: 260px;
   object-fit: contain;
   border-radius: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   background: #f8fbf9;
 }
 
@@ -748,12 +748,21 @@
   text-align: center;
 }
 
-.share-actions {
+/* 新增：按钮区域 - 放在海报内部下方 */
+.poster-actions {
+  padding: 0 18px 20px;
   display: flex;
   gap: 12px;
-  padding: 16px;
-  background: white;
-}  </style>
+}
+
+.poster-actions button {
+  flex: 1;
+  padding: 14px 0;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 16px;
+} 
+</style>
 </head>
 <body>
   <div class="shell">
@@ -796,6 +805,24 @@
       <div class="result-wrap card">
         <div class="result-layout">
           <div class="result-top">
+<!-- ==================== 新增：结果页顶部快捷操作栏 ==================== -->
+  <div style="grid-column: 1 / -1; margin-bottom: 20px;">
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      
+      <button id="topRestartBtn" class="btn-secondary" style="flex: 1; padding: 14px 0; font-size: 15px;">
+        🔄 重新测试
+      </button>
+      
+      <button id="topHomeBtn" class="btn-secondary" style="flex: 1; padding: 14px 0; font-size: 15px;">
+        🏠 回到首页
+      </button>
+      
+      <button id="topShareBtn" class="btn-primary" style="flex: 1; padding: 14px 0; font-size: 15px; background:#07c160;">
+        📤 分享到微信
+      </button>
+      
+    </div>
+  </div>
             <div class="poster-box" id="posterBox">
               <img id="posterImage" class="poster-image" alt="人格结果图" />
               <div id="posterCaption" class="poster-caption">怎么样，被我拿捏了吧？</div>
@@ -844,7 +871,7 @@
     </button>
   </div>
 </div>
-<!-- ==================== 最终版分享海报 ==================== -->
+<!-- ==================== 优化后布局的海报弹窗 ==================== -->
 <div id="shareModal">
   <div class="share-poster" id="sharePoster">
     <div class="poster-header">SBTI 人格测试</div>
@@ -862,15 +889,16 @@
         <strong>快来一起被拿捏！</strong>
       </div>
     </div>
+    
+    <!-- 按钮移到海报内部下方 -->
+    <div class="poster-actions">
+      <button onclick="closeShareModal()" class="btn-secondary">关闭</button>
+      <button onclick="sharePosterToWeChat()" class="btn-primary" style="background:#07c160;">
+        分享到微信
+      </button>
+    </div>
   </div>
-  
-  <div class="share-actions">
-    <button onclick="closeShareModal()" class="btn-secondary">关闭</button>
-    <button onclick="sharePosterToWeChat()" class="btn-primary" style="background:#07c160;">
-      直接分享到微信
-    </button>
-  </div>
-</div>     
+</div>
 <!-- ==================== 海报弹窗结束 ==================== -->
     </section>
 
@@ -1871,53 +1899,92 @@ async function shareToWeChat() {
   document.getElementById('shareModal').style.display = 'flex';
 }
 
+// ==================== 优化版：兼容电脑 + 手机 ====================
 async function sharePosterToWeChat() {
   const poster = document.getElementById('sharePoster');
+  const typeName = document.getElementById('posterTypeName').textContent || '结果';
 
   try {
     const canvas = await html2canvas(poster, {
       scale: 2.8,
       useCORS: true,
-      backgroundColor: '#ffffff'
+      backgroundColor: '#ffffff',
+      logging: false
     });
 
-    canvas.toBlob(async (blob) => {
-      if (!blob) return alert('生成图片失败');
+    // 转成图片
+    const dataURL = canvas.toDataURL('image/png');
 
-      const file = new File([blob], `SBTI_${document.getElementById('posterTypeName').textContent}.png`, { 
-        type: 'image/png' 
-      });
+    // === 电脑端：直接下载 ===
+    if (!/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+      const link = document.createElement('a');
+      link.download = `SBTI_${typeName}.png`;
+      link.href = dataURL;
+      link.click();
+      
+      alert('✅ 海报已保存！\n\n图片已下载到你的电脑，可以直接发到微信。');
+      return;
+    }
+
+    // === 手机端：尝试直接分享 ===
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        alert('生成图片失败，请重试');
+        return;
+      }
+
+      const file = new File([blob], `SBTI_${typeName}.png`, { type: 'image/png' });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: 'SBTI 人格测试结果',
-          text: `我测出了【${document.getElementById('posterTypeName').textContent}】！`
-        });
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'SBTI 人格测试结果',
+            text: `我测出了【${typeName}】！`
+          });
+        } catch (e) {
+          downloadFallback(dataURL, typeName);
+        }
       } else {
-        // 降级处理
-        const link = document.createElement('a');
-        link.download = `SBTI_${document.getElementById('posterTypeName').textContent}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        
-        setTimeout(() => {
-          alert('✅ 图片已保存到相册！\n\n请打开微信 → 朋友圈 或 聊天 → 从相册选择这张图片分享');
-        }, 600);
+        downloadFallback(dataURL, typeName);
       }
     }, 'image/png');
+
   } catch (err) {
-    alert('分享失败，请稍后重试');
     console.error(err);
+    alert('生成海报失败，请稍后重试');
   }
 }
 
+// 下载降级函数
+function downloadFallback(dataURL, typeName) {
+  const link = document.createElement('a');
+  link.download = `SBTI_${typeName}.png`;
+  link.href = dataURL;
+  link.click();
+  
+  setTimeout(() => {
+    alert('✅ 海报已保存到相册！\n\n请打开微信，从相册选择这张图片分享～');
+  }, 600);
+}
 function closeShareModal() {
   document.getElementById('shareModal').style.display = 'none';
 }
 
 // 绑定分享按钮
 document.getElementById('shareWeChatBtn').addEventListener('click', shareToWeChat);
+// ==================== 顶部三个快捷按钮功能 ====================
+document.getElementById('topRestartBtn').addEventListener('click', () => {
+  startTest(false);
+});
+
+document.getElementById('topHomeBtn').addEventListener('click', () => {
+  showScreen('intro');
+});
+
+document.getElementById('topShareBtn').addEventListener('click', () => {
+  shareToWeChat();
+});
 </script>
 <!-- 【新增】海报分享需要的两个库 -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
