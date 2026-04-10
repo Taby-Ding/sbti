@@ -878,7 +878,7 @@
                     <details class="author-box">
             <summary>作者的话</summary>
             <div class="author-content">
-              <p>本测试首发于b站up主蛆肉儿串儿（UID417038183），初衷是劝诫一位爱喝酒的朋友戒酒。</p>
+              <p>本测试首发于b站up主：Q肉儿串儿（UID417038183），初衷是劝诫一位爱喝酒的朋友戒酒。</p>
               <p>由于作者的人格是SHIT愤世者，所以平等的攻击了各位，在此抱歉！！不过我是一个绝世大美女，你们一定会原谅我，有B站的朋友们也可以关注我。</p>
               <p>关于这个测试，我没法很好的平衡娱乐和专业性，因此对于一些人格的阐释较为模糊或完全不准（如屌丝可能并非真的屌丝），如有冒犯非常抱歉！！</p>
               <p>再鉴于时间精力有限，就随便搞了一个先这样玩玩，后续会慢慢完善修改的，总之好玩为主，还请不要用于盈利呀。</p>
@@ -1925,170 +1925,101 @@ async function shareToWeChat() {
 }
 
 // ==================== 只截干净海报（不含按钮） ====================
-// ==================== 最终修复版：自动截图（暴力修复版）====================
 async function sharePosterToWeChat() {
-    const posterContent = document.getElementById('posterContent');
-    const typeName = document.getElementById('posterTypeName') ? document.getElementById('posterTypeName').textContent : '结果';
-    
-    if (!posterContent) {
-        alert('错误：找不到海报容器 posterContent');
-        return;
+  const posterContent = document.getElementById('posterContent'); // 只截内容区
+  const typeName = document.getElementById('posterTypeName').textContent.replace(/[（）]/g, '') || 'SBTI结果';
+
+  try {
+    const canvas = await html2canvas(posterContent, {
+      scale: 2.8,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false
+    });
+
+    const dataURL = canvas.toDataURL('image/png', 0.95);
+
+    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+      // 手机端：弹出干净大图让用户长按保存
+      const img = document.createElement('img');
+      img.src = dataURL;
+      img.style.cssText = `
+        position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+        max-width:92%; max-height:85%; z-index:10000; 
+        border:10px solid white; border-radius:16px; box-shadow:0 15px 40px rgba(0,0,0,0.7);
+      `;
+
+      const tips = document.createElement('div');
+      tips.style.cssText = `
+        position:fixed; bottom:40px; left:50%; transform:translateX(-50%);
+        background:rgba(0,0,0,0.85); color:white; padding:12px 24px;
+        border-radius:999px; font-size:15px; z-index:10001;
+      `;
+      tips.textContent = '👇 长按图片保存到相册';
+
+      document.body.appendChild(img);
+      document.body.appendChild(tips);
+
+      const remove = () => { img.remove(); tips.remove(); };
+      img.onclick = tips.onclick = remove;
+
+    } else {
+      // 电脑端直接下载
+      const link = document.createElement('a');
+      link.download = `SBTI_${typeName}.png`;
+      link.href = dataURL;
+      link.click();
+      alert('✅ 海报已下载！');
     }
 
-    try {
-        // 1. 确保结果已经计算并渲染
-        if (typeof computeResult === 'function') computeResult();
-        if (typeof renderResult === 'function') renderResult();
-
-        // 2. 【关键】等待所有图片加载完毕
-        await waitForImages(posterContent);
-        
-        // 3. 额外等待 1.5 秒，确保二维码渲染完成，布局稳定
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        // 4. 截图
-        const canvas = await html2canvas(posterContent, {
-            scale: 2, // 2倍清晰度
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: '#ffffff',
-            logging: false,
-            timeout: 30000,
-            
-            // ==================== 核心：在克隆文档中暴力修复样式 ====================
-            onclone: async (clonedDoc) => {
-                // A. 强制显示结果容器
-                const resultArea = clonedDoc.getElementById('result');
-                if (resultArea) {
-                    resultArea.style.display = 'block';
-                    resultArea.style.visibility = 'visible';
-                    resultArea.style.opacity = '1';
-                    resultArea.style.height = 'auto';
-                    resultArea.style.overflow = 'visible';
-                }
-
-                // B. 【关键修复】暴力修复二维码居中
-                // 找到二维码容器（请确认你的二维码 ID 是 qrcode）
-                const qrArea = clonedDoc.getElementById('qrcode');
-                if (qrArea) {
-                    // 强制使用绝对定位居中
-                    qrArea.style.position = 'absolute';
-                    qrArea.style.left = '50%';
-                    qrArea.style.transform = 'translateX(-50%)';
-                    qrArea.style.margin = '0';
-                    qrArea.style.display = 'block';
-                }
-
-                // C. 【关键修复】将所有图片转 Base64，解决跨域空白
-                const images = clonedDoc.getElementsByTagName('img');
-                for (let i = 0; i < images.length; i++) {
-                    const img = images[i];
-                    // 只有网络图片才转换
-                    if (img.src && img.src.startsWith('http')) {
-                        try {
-                            // 这是一个异步操作，必须 await
-                            await convertImgToBase64(img);
-                        } catch (e) {
-                            console.warn('图片转换失败:', img.src);
-                        }
-                    }
-                }
-            }
-        });
-
-        const dataURL = canvas.toDataURL('image/png');
-        showImageModal(dataURL, typeName);
-
-    } catch (err) {
-        console.error("生成失败:", err);
-        alert("生成海报失败: " + (err.message || "未知错误"));
-    }
+  } catch (err) {
+    console.error(err);
+    alert('生成失败，请刷新页面后重试');
+  }
 }
+// 手机专用保存方法（更可靠）
+function saveImageForMobile(dataURL, typeName) {
+  // 方法1：创建临时图片让用户长按保存
+  const img = document.createElement('img');
+  img.src = dataURL;
+  img.style.position = 'fixed';
+  img.style.top = '50%';
+  img.style.left = '50%';
+  img.style.transform = 'translate(-50%, -50%)';
+  img.style.maxWidth = '90%';
+  img.style.maxHeight = '85%';
+  img.style.zIndex = '10000';
+  img.style.border = '8px solid white';
+  img.style.borderRadius = '12px';
+  img.style.boxShadow = '0 10px 30px rgba(0,0,0,0.6)';
 
-// ==================== 辅助函数：图片转 Base64 ====================
-function convertImgToBase64(imgElement) {
-    return new Promise((resolve, reject) => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const img = new Image();
-        
-        img.crossOrigin = 'anonymous';
-        img.onload = () => {
-            canvas.width = img.naturalWidth;
-            canvas.height = img.naturalHeight;
-            ctx.drawImage(img, 0, 0);
-            imgElement.src = canvas.toDataURL('image/png'); // 替换原图 src
-            resolve();
-        };
-        img.onerror = reject;
-        img.src = imgElement.src;
-    });
-}
+  const tips = document.createElement('div');
+  tips.style.position = 'fixed';
+  tips.style.bottom = '30px';
+  tips.style.left = '50%';
+  tips.style.transform = 'translateX(-50%)';
+  tips.style.background = 'rgba(0,0,0,0.85)';
+  tips.style.color = 'white';
+  tips.style.padding = '12px 20px';
+  tips.style.borderRadius = '999px';
+  tips.style.fontSize = '15px';
+  tips.style.zIndex = '10001';
+  tips.innerHTML = '👇 长按图片保存到相册';
 
-// ==================== 辅助函数：等待图片加载 ====================
-function waitForImages(element) {
-    return new Promise((resolve) => {
-        const images = element.getElementsByTagName('img');
-        let loadedCount = 0;
-        const totalCount = images.length;
-        if (totalCount === 0) { resolve(); return; }
+  document.body.appendChild(img);
+  document.body.appendChild(tips);
 
-        for (let i = 0; i < totalCount; i++) {
-            const img = images[i];
-            if (img.complete && img.naturalHeight > 0) {
-                loadedCount++;
-            } else {
-                img.onload = () => { loadedCount++; if (loadedCount >= totalCount) resolve(); };
-                img.onerror = () => { loadedCount++; if (loadedCount >= totalCount) resolve(); };
-            }
-        }
-        if (loadedCount >= totalCount) resolve();
-    });
-}
+  // 点击图片或空白处关闭
+  const close = () => {
+    img.remove();
+    tips.remove();
+  };
+  img.onclick = close;
+  tips.onclick = close;
 
-// ==================== 辅助函数：弹窗显示图片 ====================
-function showImageModal(dataURL, fileName) {
-    const oldModal = document.getElementById('speed-poster-modal');
-    if (oldModal) oldModal.remove();
-
-    const modal = document.createElement('div');
-    modal.id = 'speed-poster-modal';
-    modal.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.85); z-index: 99999;
-        display: flex; justify-content: center; align-items: center;
-        flex-direction: column;
-    `;
-
-    const img = document.createElement('img');
-    img.src = dataURL;
-    img.style.cssText = `
-        max-width: 90%; max-height: 80%;
-        border: 5px solid #fff; border-radius: 8px;
-        background: #fff;
-    `;
-
-    const tip = document.createElement('div');
-    tip.innerHTML = `
-        <p style="color:white; font-size:18px; margin:20px 0 10px; font-weight:bold;">海报已生成</p>
-        <p style="color:#ddd; font-size:14px; margin-bottom:20px;">
-            PC端：右键图片 -> "图片另存为"<br>手机端：长按保存
-        </p>
-        <button id="closePosterModalBtn" style="padding:10px 24px; cursor:pointer; background:#07c160; color:white; border:none; border-radius:6px; font-size:16px;">关闭</button>
-    `;
-    tip.style.textAlign = 'center';
-
-    modal.appendChild(img);
-    modal.appendChild(tip);
-    document.body.appendChild(modal);
-
-    document.getElementById('closePosterModalBtn').onclick = () => modal.remove();
-    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
-}
-
-
-
-function closeShareModal() {
+  alert('✅ 海报已生成！\n\n请**长按上方图片** → 选择「保存图片」');
+}function closeShareModal() {
   document.getElementById('shareModal').style.display = 'none';
 }
 
