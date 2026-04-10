@@ -302,7 +302,7 @@ Bingran You 写的 [**sbti-cli**](https://github.com/bingran-you/sbti-cli) 用 N
     <td>把官网 <code>main.js</code> sandbox 化，暴露出 <code>TYPE_LIBRARY</code> 等内部常量，让这份 Wiki 能直接从 runtime 抓取权威数据与插画</td>
   </tr>
   <tr>
-    <td><strong>本 Wiki</strong></td>
+    <td><a href="https://github.com/serenakeyitan/sbti-wiki)"><strong>serenakeyitan</strong></a></td>
     <td><a href="https://github.com/serenakeyitan">@serenakeyitan</a></td>
     <td>把 sbti-cli 导出的数据整理成 27 页中文 Markdown 图鉴</td>
   </tr>
