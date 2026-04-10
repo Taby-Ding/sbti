@@ -114,119 +114,119 @@
 <table>
   <tr>
     <td align="center" width="33%">
-      <a href="outcomes/CTRL.md"><img src="images/CTRL.png" width="180"><br><strong>CTRL · 拿捏者</strong></a><br>
+      <a href="outcomes/CTRL.md"><img src=“image/CTRL.png" width="180"><br><strong>CTRL · 拿捏者</strong></a><br>
       <sub>人形自走任务管理器</sub><br><sub>🎲 3.61% · 1/28</sub>
     </td>
     <td align="center" width="33%">
-      <a href="outcomes/ATM-er.md"><img src="images/ATM-er.png" width="180"><br><strong>ATM-er · 送钱者</strong></a><br>
+      <a href="outcomes/ATM-er.md"><img src=“image/ATM-er.png" width="180"><br><strong>ATM-er · 送钱者</strong></a><br>
       <sub>永远在支付时间、精力、耐心</sub><br><sub>🎲 2.46% · 1/41</sub>
     </td>
     <td align="center" width="33%">
-      <a href="outcomes/Dior-s.md"><img src="images/Dior-s.jpg" width="180"><br><strong>Dior-s · 屌丝</strong></a><br>
+      <a href="outcomes/Dior-s.md"><img src=“image/Dior-s.jpg" width="180"><br><strong>Dior-s · 屌丝</strong></a><br>
       <sub>第欧根尼的精神传人</sub><br><sub>🎲 5.23% · 1/19</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <a href="outcomes/BOSS.md"><img src="images/BOSS.png" width="180"><br><strong>BOSS · 领导者</strong></a><br>
+      <a href="outcomes/BOSS.md"><img src=“image/BOSS.png" width="180"><br><strong>BOSS · 领导者</strong></a><br>
       <sub>手里永远拿着方向盘的人</sub><br><sub>🎲 1.53% · 1/65</sub>
     </td>
     <td align="center">
-      <a href="outcomes/THAN-K.md"><img src="images/THAN-K.png" width="180"><br><strong>THAN-K · 感恩者</strong></a><br>
+      <a href="outcomes/THAN-K.md"><img src=“image/THAN-K.png" width="180"><br><strong>THAN-K · 感恩者</strong></a><br>
       <sub>永不枯竭的正能量发射塔</sub><br><sub>🎲 7.76% · 1/13</sub>
     </td>
     <td align="center">
-      <a href="outcomes/OH-NO.md"><img src="images/OH-NO.png" width="180"><br><strong>OH-NO · 哦不人</strong></a><br>
+      <a href="outcomes/OH-NO.md"><img src=“image/OH-NO.png" width="180"><br><strong>OH-NO · 哦不人</strong></a><br>
       <sub>一声"Oh no!"把风险扼杀在萌芽</sub><br><sub>🎲 3.05% · 1/33</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <a href="outcomes/GOGO.md"><img src="images/GOGO.png" width="180"><br><strong>GOGO · 行者</strong></a><br>
+      <a href="outcomes/GOGO.md"><img src=“image/GOGO.png" width="180"><br><strong>GOGO · 行者</strong></a><br>
       <sub>世界只有已完成和即将被完成</sub><br><sub>🎲 3.05% · 1/33</sub>
     </td>
     <td align="center">
-      <a href="outcomes/SEXY.md"><img src="images/SEXY.png" width="180"><br><strong>SEXY · 尤物</strong></a><br>
+      <a href="outcomes/SEXY.md"><img src=“image/SEXY.png" width="180"><br><strong>SEXY · 尤物</strong></a><br>
       <sub>走进房间照明系统自动识别</sub><br><sub>🎲 5.94% · 1/17</sub>
     </td>
     <td align="center">
-      <a href="outcomes/LOVE-R.md"><img src="images/LOVE-R.png" width="180"><br><strong>LOVE-R · 多情者</strong></a><br>
+      <a href="outcomes/LOVE-R.md"><img src=“image/LOVE-R.png" width="180"><br><strong>LOVE-R · 多情者</strong></a><br>
       <sub>情感处理器是彩虹制的吟游诗人</sub><br><sub>🎲 4.23% · 1/24</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <a href="outcomes/MUM.md"><img src="images/MUM.png" width="180"><br><strong>MUM · 妈妈</strong></a><br>
+      <a href="outcomes/MUM.md"><img src=“image/MUM.png" width="180"><br><strong>MUM · 妈妈</strong></a><br>
       <sub>给自己的药剂量总是小一号</sub><br><sub>🎲 5.14% · 1/19</sub>
     </td>
     <td align="center">
-      <a href="outcomes/FAKE.md"><img src="images/FAKE.png" width="180"><br><strong>FAKE · 伪人</strong></a><br>
+      <a href="outcomes/FAKE.md"><img src=“image/FAKE.png" width="180"><br><strong>FAKE · 伪人</strong></a><br>
       <sub>切面具比切输入法还快</sub><br><sub>🎲 6.61% · 1/15</sub>
     </td>
     <td align="center">
-      <a href="outcomes/OJBK.md"><img src="images/OJBK.png" width="180"><br><strong>OJBK · 无所谓人</strong></a><br>
+      <a href="outcomes/OJBK.md"><img src=“image/OJBK.png" width="180"><br><strong>OJBK · 无所谓人</strong></a><br>
       <sub>"都行"是一种统治哲学</sub><br><sub>🎲 9.92% · 1/10</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <a href="outcomes/MALO.md"><img src="images/MALO.png" width="180"><br><strong>MALO · 吗喽</strong></a><br>
+      <a href="outcomes/MALO.md"><img src=“image/MALO.png" width="180"><br><strong>MALO · 吗喽</strong></a><br>
       <sub>灵魂还挂在树上荡秋千</sub><br><sub>🎲 5.71% · 1/18</sub>
     </td>
     <td align="center">
-      <a href="outcomes/JOKE-R.md"><img src="images/JOKE-R.jpg" width="180"><br><strong>JOKE-R · 小丑</strong></a><br>
+      <a href="outcomes/JOKE-R.md"><img src=“image/JOKE-R.jpg" width="180"><br><strong>JOKE-R · 小丑</strong></a><br>
       <sub>一层层打开最里面只剩回声</sub><br><sub>🎲 2.99% · 1/33</sub>
     </td>
     <td align="center">
-      <a href="outcomes/WOC.md"><img src="images/WOC.png" width="180"><br><strong>WOC! · 握草人</strong></a><br>
+      <a href="outcomes/WOC.md"><img src=“image/WOC.png" width="180"><br><strong>WOC! · 握草人</strong></a><br>
       <sub>表面"卧槽"后台冷静分析</sub><br><sub>🎲 2.04% · 1/49</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <a href="outcomes/THIN-K.md"><img src="images/THIN-K.png" width="180"><br><strong>THIN-K · 思考者</strong></a><br>
+      <a href="outcomes/THIN-K.md"><img src=“image/THIN-K.png" width="180"><br><strong>THIN-K · 思考者</strong></a><br>
       <sub>审判一切信息的偏执党</sub><br><sub>🎲 2.24% · 1/45</sub>
     </td>
     <td align="center">
-      <a href="outcomes/SHIT.md"><img src="images/SHIT.png" width="180"><br><strong>SHIT · 愤世者</strong></a><br>
+      <a href="outcomes/SHIT.md"><img src=“image/SHIT.png" width="180"><br><strong>SHIT · 愤世者</strong></a><br>
       <sub>嘴上骂世界手上拯救世界</sub><br><sub>🎲 2.53% · 1/40</sub>
     </td>
     <td align="center">
-      <a href="outcomes/ZZZZ.md"><img src="images/ZZZZ.png" width="180"><br><strong>ZZZZ · 装死者</strong></a><br>
+      <a href="outcomes/ZZZZ.md"><img src=“image/ZZZZ.png" width="180"><br><strong>ZZZZ · 装死者</strong></a><br>
       <sub>死线一到 29 分钟交答卷</sub><br><sub>🎲 4.68% · 1/21</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <a href="outcomes/POOR.md"><img src="images/POOR.png" width="180"><br><strong>POOR · 贫困者</strong></a><br>
+      <a href="outcomes/POOR.md"><img src=“image/POOR.png" width="180"><br><strong>POOR · 贫困者</strong></a><br>
       <sub>精力全灌一个坑的矿井</sub><br><sub>🎲 1.68% · 1/60</sub>
     </td>
     <td align="center">
-      <a href="outcomes/MONK.md"><img src="images/MONK.png" width="180"><br><strong>MONK · 僧人</strong></a><br>
+      <a href="outcomes/MONK.md"><img src=“image/MONK.png" width="180"><br><strong>MONK · 僧人</strong></a><br>
       <sub>结界神圣不可侵犯的修行者</sub><br><sub>🎲 2.8% · 1/36</sub>
     </td>
     <td align="center">
-      <a href="outcomes/IMSB.md"><img src="images/IMSB.png" width="180"><br><strong>IMSB · 傻者</strong></a><br>
+      <a href="outcomes/IMSB.md"><img src=“image/IMSB.png" width="180"><br><strong>IMSB · 傻者</strong></a><br>
       <sub>内心戏比漫威宇宙还长</sub><br><sub>🎲 4.21% · 1/24</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <a href="outcomes/SOLO.md"><img src="images/SOLO.png" width="180"><br><strong>SOLO · 孤儿</strong></a><br>
+      <a href="outcomes/SOLO.md"><img src=“image/SOLO.png" width="180"><br><strong>SOLO · 孤儿</strong></a><br>
       <sub>全身都是刺的软心脏刺猬</sub><br><sub>🎲 3.72% · 1/27</sub>
     </td>
     <td align="center">
-      <a href="outcomes/FUCK.md"><img src="images/FUCK.png" width="180"><br><strong>FUCK · 草者</strong></a><br>
+      <a href="outcomes/FUCK.md"><img src=“image/FUCK.png" width="180"><br><strong>FUCK · 草者</strong></a><br>
       <sub>除草剂杀不死的人形野草</sub><br><sub>🎲 3.38% · 1/30</sub>
     </td>
     <td align="center">
-      <a href="outcomes/DEAD.md"><img src="images/DEAD.png" width="180"><br><strong>DEAD · 死者</strong></a><br>
+      <a href="outcomes/DEAD.md"><img src=“image/DEAD.png" width="180"><br><strong>DEAD · 死者</strong></a><br>
       <sub>通关后删档 999 次的贤者</sub><br><sub>🎲 2.5% · 1/40</sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <a href="outcomes/IMFW.md"><img src="images/IMFW.png" width="180"><br><strong>IMFW · 废物</strong></a><br>
+      <a href="outcomes/IMFW.md"><img src=“image/IMFW.png" width="180"><br><strong>IMFW · 废物</strong></a><br>
       <sub>需要温室养护的兰花</sub><br><sub>🎲 2.12% · 1/47</sub>
     </td>
     <td align="center" colspan="2">
@@ -240,12 +240,12 @@
 <table>
   <tr>
     <td align="center" width="50%">
-      <a href="outcomes/HHHH.md"><img src="images/HHHH.png" width="200"><br><strong>HHHH · 傻乐者</strong></a><br>
+      <a href="outcomes/HHHH.md"><img src=“image/HHHH.png" width="200"><br><strong>HHHH · 傻乐者</strong></a><br>
       <sub>🎲 <em>触发条件</em>：最高匹配度 &lt; 60% 的系统强制兜底</sub><br>
       <sub>📊 理论占比 <strong>0.06%</strong> · 约 1/1667（全榜最稀有）</sub>
     </td>
     <td align="center" width="50%">
-      <a href="outcomes/DRUNK.md"><img src="images/DRUNK.png" width="200"><br><strong>DRUNK · 酒鬼</strong></a><br>
+      <a href="outcomes/DRUNK.md"><img src=“image/DRUNK.png" width="200"><br><strong>DRUNK · 酒鬼</strong></a><br>
       <sub>🍶 <em>触发条件</em>：饮酒题选"保温杯装白酒当白开水喝"</sub><br>
       <sub>📊 估算占比 <strong>0.8%</strong> · 约 1/125（隐藏结局）</sub>
     </td>
@@ -273,7 +273,7 @@ Bingran You 写的 [**sbti-cli**](https://github.com/bingran-you/sbti-cli) 用 N
 
 ### 形象插画从哪里来
 
-`main.js` 里还内嵌了一个全局 `TYPE_IMAGES` 对象，27 个角色插画以 `data:image/png;base64,...` 或 `data:image/jpeg;base64,...` 的形式编码在里面（共 27 项，4.6 MB）。本仓库的生成脚本把它们解码成独立文件放进 [`images/`](images/) 目录，这样 Markdown 里可以直接 `<img src="images/CTRL.png">` 引用。
+`main.js` 里还内嵌了一个全局 `TYPE_IMAGES` 对象，27 个角色插画以 `data:image/png;base64,...` 或 `data:image/jpeg;base64,...` 的形式编码在里面（共 27 项，4.6 MB）。本仓库的生成脚本把它们解码成独立文件放进 [`images/`](images/) 目录，这样 Markdown 里可以直接 `<img src=“image/CTRL.png">` 引用。
 
 ### 完整数据表
 
