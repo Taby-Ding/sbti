@@ -764,8 +764,23 @@
   font-weight: 700;
 }
 
-/* === 超速版按钮样式 === */
+/* === 超速版按钮样式 (透明度版) === */
 .hero-actions .btn-accel {
+    /* 1. 默认透明 (看不见) */
+    opacity: 0;
+    
+    /* 2. 禁止点击 (看不见的时候也不能点) */
+    pointer-events: none;
+    
+    /* 3. 保持布局占位 */
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 15px;
+    
+    /* 4. 增加一个过渡动画 (让显示过程更丝滑) */
+    transition: opacity 0.5s ease, transform 0.3s ease;
+    
+    /* 5. 原有漂亮样式 */
     background: linear-gradient(135deg, #ff8a00, #da4000);
     color: #fff;
     padding: 14px 20px;
@@ -774,11 +789,41 @@
     font-weight: 700;
     border: none;
     font-size: 16px;
+    cursor: pointer;
+    font-family: sans-serif;
 }
+
 .hero-actions .btn-accel:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 16px 40px rgba(255, 138, 0, 0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(255, 138, 0, 0.4);
 }
+
+/* --- 1. 强制隐藏超速版按钮 (封印状态) --- */
+#→speedBtn {
+    display: none !important; /* 强制隐藏，最高优先级 */
+    visibility: hidden;       /* 双重保险：不可见 */
+    opacity: 0;               /* 双重保险：透明 */
+}
+
+/* 线索文字样式 */
+#versionTrigger {
+    cursor: pointer;
+    color: #999;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 50px;
+    user-select: none;
+    transition: color 0.3s;
+}
+
+#versionTrigger:hover,
+#versionTrigger.active {
+    color: #ff3c78;
+    font-weight: bold;
+}
+
+
+
 </style>
 </head>
 <body>
@@ -2013,6 +2058,82 @@ document.getElementById('speedBtn').addEventListener('click', () => {
     // 这里直接调用 renderResult，它会自动调用 computeResult
     renderResult();
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("🚀 页面加载完成，开始初始化...");
+
+    // --- 1. 获取按钮元素 ---
+    // 重点：这里必须用你 HTML 里真实的 ID！
+    // 如果你的按钮没有 id，请务必在 HTML 里加上 id="speedBtn"
+    const speedBtn = document.getElementById('speedBtn');
+
+    // 调试：如果这里打印 null，说明 JS 找不到按钮，或者 ID 写错了
+    if (!speedBtn) {
+        console.error("❌ 错误：找不到超速版按钮！请检查 HTML 中按钮的 id 是否为 'speedBtn'");
+    } else {
+        console.log("✅ 找到按钮元素:", speedBtn);
+        // 初始化：确保它是隐藏的
+        speedBtn.style.opacity = '0';
+        speedBtn.style.pointerEvents = 'none';
+    }
+
+    // --- 2. 线索元素 ---
+    let trigger = document.getElementById('versionTrigger');
+    if (!trigger) {
+        trigger = document.createElement('div');
+        trigger.id = 'versionTrigger';
+        trigger.innerHTML = 'v2.0s';
+        trigger.style.cssText = 'text-align:center; margin: 50px 0 20px; font-size:24px; cursor:pointer; color:#999;';
+        document.body.appendChild(trigger);
+    }
+
+    // --- 3. 彩蛋逻辑 ---
+    let clickCount = 0;
+    let pressTimer = null;
+
+    const startPress = () => {
+        trigger.classList.add('active');
+        trigger.innerText = "按住2秒解锁...";
+        pressTimer = setTimeout(activateSpeedMode, 2000);
+    };
+
+    const endPress = () => {
+        clearTimeout(pressTimer);
+        trigger.classList.remove('active');
+        trigger.innerText = "v2.0s";
+        
+        clickCount++;
+        setTimeout(() => { clickCount = 0; }, 500);
+        if (clickCount >= 5) activateSpeedMode();
+    };
+
+    trigger.addEventListener('mousedown', startPress);
+    trigger.addEventListener('touchstart', startPress);
+    trigger.addEventListener('mouseup', endPress);
+    trigger.addEventListener('mouseleave', endPress);
+    trigger.addEventListener('touchend', endPress);
+
+    // --- 4. 激活函数 ---
+    function activateSpeedMode() {
+        console.log("🔓 激活函数被调用！");
+
+        if (speedBtn) {
+            // 强制修改样式
+            speedBtn.style.opacity = '1';
+            speedBtn.style.pointerEvents = 'auto';
+            console.log("✅ 按钮样式已修改，应该显示了");
+        } else {
+            console.error("❌ 按钮变量为空，无法显示");
+        }
+        
+        trigger.innerText = "超速模式已解锁";
+        trigger.style.color = "#ff3c78";
+        trigger.style.fontWeight = "bold";
+    }
+});
+
+
+
 </script>
 <!-- 【新增】海报分享需要的两个库 -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
